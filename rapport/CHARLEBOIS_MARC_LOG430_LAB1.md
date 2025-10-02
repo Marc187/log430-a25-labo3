@@ -111,7 +111,40 @@ Concernant l’article déjà présent dans la base avec l’id=2, celui-ci n’
 
 > Décrivez l'utilisation de la méthode join dans ce cas. Utilisez les méthodes telles que décrites à Simple Relationship Joins et Joins to a Target with an ON Clause dans la documentation SQLAlchemy pour ajouter les colonnes demandés dans cette activité. Veuillez inclure le code pour illustrer votre réponse.
 
+La méthode join de SQLAlchemy est utilisée ici pour relier la table `stocks` à la table `products` grâce à la clé étrangère `Stock.product_id` et la clé primaire `Product.id`. Cette jointure permet de compléter les informations de stock (quantité) avec des données du produit (`name`, `sku`, `price`) issues de la table `products`, ce qui correspond à une clause `INNER JOIN` en SQL. Ainsi, chaque ligne renvoyée contient à la fois les informations d’inventaire et les détails du produit, comme le montre le code ci-dessous :
 
+```Python
+def get_stock_for_all_products():
+    """Get stock quantity for all products"""
+    session = get_sqlalchemy_session()
+
+    results = (
+        session.query(
+            Stock.product_id,
+            Product.name,
+            Product.sku,
+            Product.price,
+            Stock.quantity
+        )
+        .join(Product, Stock.product_id == Product.id)
+        .all()
+    )
+
+    stock_data = []
+    for row in results:
+        stock_data.append({
+            'Identifiant': row.product_id,
+            'Article': row.name,
+            'Numéro SKU': row.sku,
+            'Prix unitaire': float(row.price),
+            'Unités en stock': int(row.quantity),
+        })
+
+    return stock_data
+```
+
+
+![alt text](question2.png)
 
 ### **Question 3**
 
