@@ -150,6 +150,9 @@ def get_stock_for_all_products():
 
 > Quels résultats avez-vous obtenus en utilisant l’endpoint POST /stocks/graphql avec la requête suggérée ? Veuillez joindre la sortie de votre requête dans Postman afin d’illustrer votre réponse.
 
+En utilisant l’endpoint `POST` `/stocks/graphql-query` avec la requête GraphQL suggérée, nous avons obtenu en sortie un objet JSON contenant les informations du produit avec l’`id = 1`. Plus précisément, la réponse inclut les champs demandés `id`, `quantity` et `name`, ce qui montre la capacité de l’endpoint à gérer dynamiquement les attributs retournés. Le résultat était le suivant :
+
+![alt text](question3.png)
 
 
 ### **Question 4**
