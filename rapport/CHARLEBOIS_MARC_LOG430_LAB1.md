@@ -216,3 +216,39 @@ Après l’ajout des champs name, sku et price dans le schéma GraphQL et l’en
 ### **Question 6**
 
 Examinez attentivement le fichier docker-compose.yml du répertoire scripts, ainsi que celui situé à la racine du projet. Qu’ont-ils en commun ? Par quel mécanisme ces conteneurs peuvent-ils communiquer entre eux ? Veuillez joindre du code YML afin d’illustrer votre réponse.
+
+Les deux fichiers docker-compose.yml ont en commun qu’ils attachent tous leurs services au même réseau utilisateur `labo03-network` (déclaré en external et de type bridge). C’est précisément ce réseau Docker partagé qui permet la communication inter-conteneurs via la résolution DNS intégrée de Docker : chaque service est joignable par son nom de service (ex. store_manager) plutôt que par localhost. Ainsi, le conteneur supplier_app peut appeler l’API par `http://store_manager:5000/...` sans exposer de port supplémentaire entre conteneurs (les ports: ne servent que pour l’accès depuis la machine hôte).
+
+Le service `store_manager`, `mysql` et `redis` sont reliés au réseau `labo03-network` pour être accessible par les autres conteneurs.
+```Yaml
+services:
+  store_manager:
+    networks:
+      - labo03-network
+
+  mysql:
+    networks:
+      - labo03-network
+
+  redis:
+    networks:
+      - labo03-network
+
+networks:
+  labo03-network:
+    driver: bridge
+    external: true
+```
+
+On réutilise le réseau `labo03-network` (déjà créé) pour garantir que `supplier_app` et les autres services sont dans le même espace réseau.
+```Yaml
+services:
+  supplier_app:
+    networks:
+      - labo03-network
+
+networks:
+  labo03-network:
+    driver: bridge
+    external: true
+```

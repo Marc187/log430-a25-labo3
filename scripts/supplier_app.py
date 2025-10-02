@@ -9,12 +9,12 @@ import signal
 from endpoint_tester import EndpointTester
 
 # Test parameters
-ENDPOINT_URL = "http://localhost:5000/stocks/graphql-query"
+ENDPOINT_URL = "http://store_manager:5000/stocks/graphql-query"
 # From within a container in the same network: http://log430-a25-labo3-store_manager:5000/stocks/graphql-query
-TEST_PAYLOAD = "{\"query\":\"{\\n  product(id: \\\"1\\\") {\\n    id\\n    name\\n    quantity\\n  }\\n}\\n\",\"variables\":{}}"
-INTERVAL_SECONDS = 10  
-TIMEOUT_SECONDS = 10   
-MAX_RETRIES = 3  
+TEST_PAYLOAD = "{\"query\":\"{\\n  product(id: \\\"1\\\") {\\n    id\\n    name\\n    sku\\n    price\\n    quantity\\n  }\\n}\\n\",\"variables\":{}}"
+INTERVAL_SECONDS = 10
+TIMEOUT_SECONDS = 10
+MAX_RETRIES = 3
 
 # Logging setup
 logging.basicConfig(
@@ -36,7 +36,7 @@ def signal_handler(signum, frame):
 if __name__ == "__main__":
     # Register signal handler for graceful shutdown
     signal.signal(signal.SIGINT, signal_handler)
-    
+
     # Create and run the tester
     caller = EndpointTester(
         url=ENDPOINT_URL,
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         max_retries=MAX_RETRIES,
         logger=logger
     )
-    
+
     try:
         caller.run()
     except KeyboardInterrupt:
