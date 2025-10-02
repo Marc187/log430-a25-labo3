@@ -80,7 +80,7 @@ UNIVERSITÉ DU QUÉBEC
   - [**Question 3**](#question-3)
   - [**Question 4**](#question-4)
   - [**Question 5**](#question-5)
-  - [\**Question 6*](#question-6)
+  - [**Question 6**](#question-6)
 
 <br>
 <br>
@@ -150,7 +150,7 @@ def get_stock_for_all_products():
 
 > Quels résultats avez-vous obtenus en utilisant l’endpoint POST /stocks/graphql avec la requête suggérée ? Veuillez joindre la sortie de votre requête dans Postman afin d’illustrer votre réponse.
 
-En utilisant l’endpoint `POST` `/stocks/graphql-query` avec la requête GraphQL suggérée, nous avons obtenu en sortie un objet JSON contenant les informations du produit avec l’`id = 1`. Plus précisément, la réponse inclut les champs demandés `id`, `quantity` et `name`, ce qui montre la capacité de l’endpoint à gérer dynamiquement les attributs retournés. Le résultat était le suivant :
+En utilisant l’endpoint `POST` `/stocks/graphql-query` avec la requête GraphQL suggérée, nous avons obtenu en sortie un objet JSON contenant les informations du produit avec l’`id = 1`. Plus précisément, la réponse inclut les champs demandés `id` et `quantity`, ce qui montre la capacité de l’endpoint à gérer dynamiquement les attributs retournés. Le résultat était le suivant :
 
 ![alt text](question3.png)
 
@@ -159,14 +159,60 @@ En utilisant l’endpoint `POST` `/stocks/graphql-query` avec la requête GraphQ
 
 > Quelles lignes avez-vous changez dans update_stock_redis? Veuillez joindre du code afin d’illustrer votre réponse.
 
+J’ai modifié la fonction update_stock_redis en ajoutant un appel à `get_product_by_id(product_id)` pour récupérer les informations complètes du produit (`name`, `sku`, `price`), puis je les ai intégrées directement dans le `pipeline.hset` en plus de la `quantity` qui était déjà présente. Ainsi, chaque entrée Redis pour un produit contient désormais toutes les informations nécessaires pour que l’endpoint GraphQL puisse les exposer.
+
+```Python
+def update_stock_redis(order_items, operation):
+    """ Update stock quantities in Redis """
+    if not order_items:
+        return
+    r = get_redis_conn()
+    stock_keys = list(r.scan_iter("stock:*"))
+    if stock_keys:
+        pipeline = r.pipeline()
+        for item in order_items:
+            if hasattr(item, 'product_id'):
+                product_id = item.product_id
+                quantity = item.quantity
+            else:
+                product_id = item['product_id']
+                quantity = item['quantity']
+
+            current_stock = r.hget(f"stock:{product_id}", "quantity")
+            current_stock = int(current_stock) if current_stock else 0
+
+            product = get_product_by_id(product_id)
+
+            if operation == '+':
+                new_quantity = current_stock + quantity
+            else:
+                new_quantity = current_stock - quantity
+
+            pipeline.hset(
+                f"stock:{product_id}",
+                mapping={
+                    "name": product['name'],
+                    "sku": product['sku'],
+                    "price": product['price'],
+                    "quantity": new_quantity
+                }
+            )
+        pipeline.execute()
+
+    else:
+        _populate_redis_from_mysql(r)
+```
 
 
 ### **Question 5**
 
 > Quels résultats avez-vous obtenus en utilisant l’endpoint POST /stocks/graphql avec les améliorations ? Veuillez joindre la sortie de votre requête dans Postman afin d’illustrer votre réponse.
 
+Après l’ajout des champs name, sku et price dans le schéma GraphQL et l’enrichissement de Redis, l’endpoint `POST /stocks/graphql-query` retourne désormais toutes les informations demandées pour un produit. En exécutant la même requête, mais en ajoutant les nouveaux champs `sku`, `name` et `price`, ce qui m'a donné le résultat suivant:
+
+![alt text](question5.png)
 
 
-### **Question 6*
+### **Question 6**
 
 Examinez attentivement le fichier docker-compose.yml du répertoire scripts, ainsi que celui situé à la racine du projet. Qu’ont-ils en commun ? Par quel mécanisme ces conteneurs peuvent-ils communiquer entre eux ? Veuillez joindre du code YML afin d’illustrer votre réponse.
