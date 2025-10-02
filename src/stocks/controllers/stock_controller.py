@@ -17,7 +17,6 @@ def set_stock(request):
         result = set_stock_for_product(product_id, quantity)
         return jsonify({'result': result}), 201
     except Exception as e:
-        print(e)
         return jsonify({'error': str(e)}), 500
 
 def get_stock(product_id):

@@ -23,13 +23,10 @@ def test_health(client):
 def test_stock_flow(client):
 
     # 1. Créez un article (`POST /products`)
-    unique_sku = f"sku_{int(time.time())}"
-    product_data = {'name': 'Some Item', 'sku': unique_sku, 'price': 99.90}
+    product_data = {'name': 'Some Item', 'sku': 'item', 'price': 56.95}
     response = client.post('/products',
                           data=json.dumps(product_data),
                           content_type='application/json')
-    print("HELLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO2")
-    print(response.get_data(as_text=True))
 
     assert response.status_code == 201
     data = response.get_json()
@@ -52,7 +49,14 @@ def test_stock_flow(client):
 
     # 4. Faites une commande de l'article que vous avez créé, 2 unités (`POST /orders`)
 
-    order_data = { 'user_id': 1, 'items': [{ 'product_id': product_id }] }
+    order_data = {
+        'user_id': 1,
+        'items': [{
+            'product_id': product_id,
+            'quantity': 2
+            }]
+        }
+
     response = client.post('/orders',
                           data=json.dumps(order_data),
                           content_type='application/json')

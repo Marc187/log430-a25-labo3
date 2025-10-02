@@ -36,7 +36,7 @@ def get_order(order_id):
         return jsonify(order), 201
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    
+
 def get_report_highest_spending_users():
     """Get orders report: highest spending users"""
     return get_highest_spending_users()
