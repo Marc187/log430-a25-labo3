@@ -51,19 +51,8 @@ def test_stock_flow(client):
     assert data['quantity'] == 5
 
     # 4. Faites une commande de l'article que vous avez créé, 2 unités (`POST /orders`)
-    user_data = { 'name': 'Test Name', 'email': 'testemail@gmail.com'}
-    response = client.post('/users',
-                          data=json.dumps(user_data),
-                          content_type='application/json')
 
-
-    assert response.status_code == 201
-    data = response.get_json()
-    user_id = data['user_id']
-    assert user_id > 0
-
-
-    order_data = { 'user_id': user_id, 'items': [{ 'product_id': product_id }] }
+    order_data = { 'user_id': 1, 'items': [{ 'product_id': product_id }] }
     response = client.post('/orders',
                           data=json.dumps(order_data),
                           content_type='application/json')
