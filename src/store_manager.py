@@ -10,7 +10,7 @@ from orders.controllers.order_controller import create_order, remove_order, get_
 from orders.controllers.user_controller import create_user, remove_user, get_user
 from stocks.controllers.product_controller import create_product, remove_product, get_product
 from stocks.controllers.stock_controller import get_stock, set_stock, get_stock_overview
- 
+
 app = Flask(__name__)
 
 @app.get('/health-check')
@@ -54,7 +54,7 @@ def post_stocks():
     """Set product stock based on information on request body"""
     return set_stock(request)
 
-# Read routes (Queries) 
+# Read routes (Queries)
 @app.get('/orders/<int:order_id>')
 def get_order_id(order_id):
     """Get order with a given order_id"""
