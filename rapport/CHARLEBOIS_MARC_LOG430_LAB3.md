@@ -81,6 +81,7 @@ UNIVERSITÉ DU QUÉBEC
   - [**Question 4**](#question-4)
   - [**Question 5**](#question-5)
   - [**Question 6**](#question-6)
+  - [**CI/CD**](#cicd)
 
 <br>
 <br>
@@ -252,3 +253,16 @@ networks:
     driver: bridge
     external: true
 ```
+
+### **CI/CD**
+
+Mon pipeline CI/CD fonctionne ainsi : lors de chaque push ou pull request, mon script CI s’exécute sur GitHub Actions, lance un environnement avec MySQL et Redis, installe les dépendances et exécute les tests pour valider mon code. Si tout est correct, mon script CD se déclenche automatiquement via un runner self-hosted installé sur ma VM, qui récupère le dépôt, génère le fichier .env, construit et démarre les conteneurs avec Docker Compose, puis affiche l’état et les logs pour confirmer le déploiement.
+
+On peut voir ci-dessous que les deux workflows se sont exécutés correctement, ce qui confirme que l’application a été testée puis déployée sans erreur.
+![alt text](cicd1.png)
+
+Le déploiement s’effectue sur mon runner auto-hébergé configuré sur la VM, qui exécute directement les commandes Docker.
+![alt text](cicd2.png)
+
+La commande `docker ps` montre que les conteneurs sont bien lancés sur la VM et que l’application est en fonctionnement.
+![alt text](cicd3.png)
