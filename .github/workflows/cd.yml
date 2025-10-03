@@ -39,6 +39,10 @@ jobs:
           docker compose pull || true
           docker compose build --no-cache
 
+      - name: Ensure external network exists
+        run: |
+            docker network inspect labo03-network >/dev/null 2>&1 || docker network create labo03-network
+
       - name: Up app
         run: |
           docker compose up -d --remove-orphans
